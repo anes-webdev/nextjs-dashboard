@@ -27,20 +27,30 @@ export type State = {
     status?: string[];
   };
   message?: string | null;
+  values?: {
+    customerId?: string;
+    amount?: string;
+    status?: string;
+  }
 };
 
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 
 export async function createInvoice(prevState: State, formData: FormData) {
-  const validatedFields = CreateInvoice.safeParse({
-    customerId: formData.get("customerId"),
-    amount: formData.get("amount"),
-    status: formData.get("status"),
-  });
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+  const rawData = {
+    customerId: formData.get("customerId") as string,
+    amount: formData.get("amount") as string,
+    status: formData.get("status") as string,
+  };
+
+  const validatedFields = CreateInvoice.safeParse(rawData);
+
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Missing Fields. Failed to Create Invoice.',
+      values: rawData,
     };
   }
   const { amount, customerId, status } = validatedFields.data;
